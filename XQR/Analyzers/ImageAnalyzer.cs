@@ -2,9 +2,8 @@ using System;
 using Android.Gms.Vision;
 using Android.Graphics;
 using AndroidX.Camera.Core;
-using Java.Nio;
 
-namespace CameraXTestApp.Analyzers
+namespace XQR.Analyzers
 {
     /// <summary>
     /// Provides an implementation of ImageAnalysis.IAnalyzer and calls the given Action with a Frame from

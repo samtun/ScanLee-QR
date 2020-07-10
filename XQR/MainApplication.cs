@@ -4,7 +4,7 @@ using Android.Runtime;
 using AndroidX.Camera.Camera2;
 using AndroidX.Camera.Core;
 
-namespace CameraXTestApp
+namespace XQR
 {
     [Application]
     public class MainApplication : Application, CameraXConfig.IProvider

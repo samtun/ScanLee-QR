@@ -15,9 +15,9 @@ using AndroidX.Camera.View;
 using AndroidX.ConstraintLayout.Widget;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
-using CameraXTestApp.Analyzers;
 using Java.Lang;
 using Java.Util.Concurrent;
+using XQR.Analyzers;
 using Uri = Android.Net.Uri;
 
 namespace XQR
