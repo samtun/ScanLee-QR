@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
-using Android.Gms.Tasks;
 using Android.Gms.Vision;
 using Android.Gms.Vision.Barcodes;
 using Android.OS;
 using Android.Views;
+using Android.Webkit;
 using Android.Widget;
 using AndroidX.AppCompat.App;
 using AndroidX.Camera.Core;
@@ -17,7 +18,10 @@ using AndroidX.Core.App;
 using AndroidX.Core.Content;
 using Java.Lang;
 using Java.Util.Concurrent;
+using Plugin.Clipboard;
 using XQR.Analyzers;
+using XQR.Enums;
+using XQR.Models;
 using Uri = Android.Net.Uri;
 
 namespace XQR
@@ -46,27 +50,19 @@ namespace XQR
         private const int RequestCodePermissions = 10;
         private const string RequiredPermission = Android.Manifest.Permission.Camera;
 
-        private string _result;
-        private string Result
-        {
-            get => _result;
-            set
-            {
-                if (value == null)
-                {
-                    return;
-                }
-                _result = value;
-                RunOnUiThread(() =>
-                {
-                    _resultButton.Text = _result;
-                    _resultButtonWrapper.Visibility = ViewStates.Visible;
-                });
-            }
-        }
+        private string _wifiPatternStart = @"WIFI:.*";
+        private string _wifiPatternEnd = @"((;(S|H|T|P):)|;;$|;$)";
+        private Regex WifiSsidPattern => new Regex(@"" + _wifiPatternStart + @"S:(([A-z0-9]|^\S)+)" + _wifiPatternEnd);
+        private Regex WifiTypePattern => new Regex(@"" + _wifiPatternStart + @"T:(WPA|WEP)" + _wifiPatternEnd);
+        private Regex WifiPasswordPattern => new Regex(@"" + _wifiPatternStart + @"P:(.+?)" + _wifiPatternEnd);
+        private Regex WifiHiddenPattern => new Regex(@"" + _wifiPatternStart + @"H:(true|false)" + _wifiPatternEnd);
 
-        private CancellationToken _resultCancellationToken = new CancellationTokenSource().Token;
-        
+        private WifiAccessPoint _wifiAccessPoint;
+
+        private string _result;
+
+        private ScanResultType _resultType = ScanResultType.URI;
+
         private bool AllPermissionsGranted =>
             ContextCompat.CheckSelfPermission(BaseContext, RequiredPermission) == Permission.Granted;
 
@@ -152,7 +148,31 @@ namespace XQR
             if (barcodeResults.Size() > 0)
             {
                 var scanResult = (Barcode) barcodeResults.ValueAt(0);
-                Result = scanResult.RawValue;
+                _result = scanResult.RawValue;
+
+                var resultButtonText = "No Data Found";
+                if (URLUtil.IsValidUrl(_result))
+                {
+                    _resultType = ScanResultType.URI;
+                    resultButtonText = "Open " + _result;
+                } else {
+                    _wifiAccessPoint = ResultToWifiInformation();
+                    if (_wifiAccessPoint != null)
+                    {
+                        _resultType = ScanResultType.WIFI;
+                        resultButtonText = "Copy password for " + _wifiAccessPoint.Ssid;
+                    }
+                    else
+                    {
+                        _resultType = ScanResultType.UNKNOWN;
+                    }
+                }
+
+                RunOnUiThread(() =>
+                {
+                    _resultButton.Text = resultButtonText;
+                    _resultButtonWrapper.Visibility = ViewStates.Visible;
+                });
             }
 
             barcodeResults.Clear();
@@ -177,15 +197,46 @@ namespace XQR
 
         private void HandleResult(object sender, EventArgs eventArgs)
         {
-            if (_result == null)
+            switch (_resultType)
             {
-                return;
+                case ScanResultType.WIFI:
+                    // TODO Offer to connect directly here?
+                    CrossClipboard.Current.SetText(_wifiAccessPoint.Password);
+                    var toast = Toast.MakeText(this, "Password copied", ToastLength.Short);
+                    toast.Show();
+                    break;
+                case ScanResultType.URI:
+                    // Open the result in a browser
+                    var uri = Uri.Parse(_result);
+                    var intent = new Intent(Intent.ActionView, uri);
+                    StartActivity(intent);
+                    break;
+                default:
+                    // nop
+                    break;
             }
+        }
+
+        private WifiAccessPoint ResultToWifiInformation()
+        {
+            var ssidMatch = WifiSsidPattern.Match(_result);
+            var typeMatch = WifiTypePattern.Match(_result);
+            var passwordMatch = WifiPasswordPattern.Match(_result);
             
-            // Open the result in the browser
-            var uri = Uri.Parse(_result);
-            var intent = new Intent(Intent.ActionView, uri);
-            StartActivity (intent);
+            if (ssidMatch.Success
+                && typeMatch.Success
+                && passwordMatch.Success)
+            {
+                var hiddenMatch = WifiHiddenPattern.Match(_result);
+                var wifiIsHidden = hiddenMatch.Groups[1].ToString().Equals("true");
+                return new WifiAccessPoint(
+                    ssidMatch.Groups[1].ToString(),
+                    passwordMatch.Groups[1].ToString(),
+                    typeMatch.Groups[1].ToString(),
+                    wifiIsHidden);
+            }
+
+            return null;
         }
 
         private void HideResultWrapper(object sender, EventArgs eventArgs)
