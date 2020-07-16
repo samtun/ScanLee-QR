@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SimpleQR</string>
+    <string name="action_open">Open</string>
+    <string name="action_copy">Copy</string>
+</resources>
