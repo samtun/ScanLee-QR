@@ -8,12 +8,12 @@ A simple QR scanner for Android. Created by using CameraX from AndroidX and Xama
 
 - Open URLs
 - Read Wifi Information (copy password)
+- Copy Plain text
 
 ## Roadmap
 
 QR Code data patterns to come:
 
-- Plain text
 - E-Mail
 - Event
 - Location

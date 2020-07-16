@@ -5,6 +5,7 @@ namespace SimpleQR.Enums
     {
         URI,
         WIFI,
+        PLAIN_TEXT,
         UNKNOWN
     }
 }

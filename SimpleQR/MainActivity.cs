@@ -149,23 +149,30 @@ namespace SimpleQR
             {
                 var scanResult = (Barcode) barcodeResults.ValueAt(0);
                 _result = scanResult.RawValue;
-
                 var resultButtonText = "No Data Found";
-                if (URLUtil.IsValidUrl(_result))
+                _wifiAccessPoint = ResultToWifiInformation();
+                if (_wifiAccessPoint != null)
                 {
+                    // WIFI Information found
+                    _resultType = ScanResultType.WIFI;
+                    resultButtonText = $"Copy password for '{_wifiAccessPoint.Ssid}'";
+                }
+                else if (URLUtil.IsValidUrl(_result))
+                {
+                    // URL Found
                     _resultType = ScanResultType.URI;
-                    resultButtonText = "Open " + _result;
-                } else {
-                    _wifiAccessPoint = ResultToWifiInformation();
-                    if (_wifiAccessPoint != null)
-                    {
-                        _resultType = ScanResultType.WIFI;
-                        resultButtonText = "Copy password for " + _wifiAccessPoint.Ssid;
-                    }
-                    else
-                    {
-                        _resultType = ScanResultType.UNKNOWN;
-                    }
+                    resultButtonText = $"Open {_result}";
+                }
+                else if (!string.IsNullOrEmpty(_result))
+                {
+                    // Plain text found
+                    _resultType = ScanResultType.PLAIN_TEXT;
+                    resultButtonText = $"Copy '{_result}'";
+                }
+                else
+                {
+                    // No data found
+                    _resultType = ScanResultType.UNKNOWN;
                 }
 
                 RunOnUiThread(() =>
@@ -202,14 +209,19 @@ namespace SimpleQR
                 case ScanResultType.WIFI:
                     // TODO Offer to connect directly here?
                     CrossClipboard.Current.SetText(_wifiAccessPoint.Password);
-                    var toast = Toast.MakeText(this, "Password copied", ToastLength.Short);
-                    toast.Show();
+                    var wifiToast = Toast.MakeText(this, "Password copied", ToastLength.Short);
+                    wifiToast.Show();
                     break;
                 case ScanResultType.URI:
                     // Open the result in a browser
                     var uri = Uri.Parse(_result);
                     var intent = new Intent(Intent.ActionView, uri);
                     StartActivity(intent);
+                    break;
+                case ScanResultType.PLAIN_TEXT:
+                    CrossClipboard.Current.SetText(_result);
+                    var textToast = Toast.MakeText(this, "Result copied", ToastLength.Short);
+                    textToast.Show();
                     break;
                 default:
                     // nop
