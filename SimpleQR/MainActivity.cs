@@ -26,7 +26,9 @@ using Uri = Android.Net.Uri;
 
 namespace SimpleQR
 {
-    [Activity(Label = "@string/app_name", Theme = "@style/Theme.AppCompat.Light.NoActionBar", MainLauncher = true, Icon = "@mipmap/ic_launcher")]
+    [Activity(Label = "@string/app_name", Theme = "@style/Theme.AppCompat.Light.NoActionBar",
+        MainLauncher = true, Icon = "@mipmap/ic_launcher",
+        ConfigurationChanges = ConfigChanges.Locale | ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : AppCompatActivity
     {
         // Camera elements
@@ -161,13 +163,15 @@ namespace SimpleQR
                 {
                     // URL Found
                     _resultType = ScanResultType.URI;
-                    resultButtonText = $"Open {_result}";
+                    var openActionText = Resources.GetText(Resource.String.action_open);
+                    resultButtonText = $"{openActionText}: {_result}";
                 }
                 else if (!string.IsNullOrEmpty(_result))
                 {
                     // Plain text found
                     _resultType = ScanResultType.PLAIN_TEXT;
-                    resultButtonText = $"Copy '{_result}'";
+                    var copyActionText = Resources.GetText(Resource.String.action_open);
+                    resultButtonText = $"{copyActionText}: {_result}";
                 }
                 else
                 {
@@ -198,7 +202,9 @@ namespace SimpleQR
             }
 
             _torchIsActive = !_torchIsActive;
-            _torchButton.Text = _torchIsActive ? "Torch On" : "Torch Off";
+            _torchButton.SetBackgroundResource(_torchIsActive
+                ? Resource.Drawable.torch_on
+                : Resource.Drawable.torch_off);
             _camera.CameraControl.EnableTorch(_torchIsActive);
         }
 
