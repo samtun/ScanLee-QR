@@ -49,8 +49,8 @@ namespace SimpleQR
         private Button _cancelResultButton;
         private ConstraintLayout _resultButtonWrapper;
 
-        private const int RequestCodePermissions = 10;
-        private const string RequiredPermission = Android.Manifest.Permission.Camera;
+        private const int RequestCameraPermissionCode = 10;
+        private readonly string CameraPermission = Android.Manifest.Permission.Camera;
 
         private string _wifiPatternStart = @"WIFI:.*";
         private string _wifiPatternEnd = @"((;(S|H|T|P):)|;;$|;$)";
@@ -65,8 +65,7 @@ namespace SimpleQR
 
         private ScanResultType _resultType = ScanResultType.URI;
 
-        private bool AllPermissionsGranted =>
-            ContextCompat.CheckSelfPermission(BaseContext, RequiredPermission) == Permission.Granted;
+        private bool CameraPermissionGranted => ContextCompat.CheckSelfPermission(BaseContext, CameraPermission) == Permission.Granted;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -86,15 +85,14 @@ namespace SimpleQR
 
             _barcodeDetector = new BarcodeDetector.Builder(this).SetBarcodeFormats(BarcodeFormat.QrCode).Build();
 
-            // Request camera permissions
-            if (AllPermissionsGranted)
+            // Request camera permission
+            if (CameraPermissionGranted)
             {
                 StartCamera();
             }
             else
             {
-                ActivityCompat.RequestPermissions(
-                    this, new string[] {RequiredPermission}, RequestCodePermissions);
+                ActivityCompat.RequestPermissions(this, new string[] { CameraPermission }, RequestCameraPermissionCode);
             }
 
             _cameraExecutor = Executors.NewSingleThreadExecutor();
@@ -151,33 +149,45 @@ namespace SimpleQR
             {
                 var scanResult = (Barcode) barcodeResults.ValueAt(0);
                 _result = scanResult.RawValue;
-                var resultButtonText = "No Data Found";
+                var resultButtonText = Resources.GetText(Resource.String.no_data_found);
                 _wifiAccessPoint = ResultToWifiInformation();
 
                 if (_wifiAccessPoint != null)
                 {
-                    // WIFI Information found
+                    // WIFI information
                     _resultType = ScanResultType.WIFI;
                     var copyPasswordForActionText = Resources.GetText(Resource.String.action_copy_password_for);
                     resultButtonText = $"{copyPasswordForActionText}: {_wifiAccessPoint.Ssid}";
                 }
                 else if (URLUtil.IsValidUrl(_result))
                 {
-                    // URL Found
+                    // URL
                     _resultType = ScanResultType.URI;
                     var openActionText = Resources.GetText(Resource.String.action_open);
                     resultButtonText = $"{openActionText}: {_result}";
                 }
+                else if (ResultIsPhoneNumber)
+                {
+                    // Phone number
+                    _resultType = ScanResultType.PHONE;
+                    var callActionText = Resources.GetText(Resource.String.action_call);
+                    var callExtActionText = Resources.GetText(Resource.String.action_call_ext);
+                    if (ResultIsTelUri)
+                    {
+                        _result = _result.Substring(4);
+                    }
+                    resultButtonText = $"{callActionText} {_result} {callExtActionText}";
+                }
                 else if (!string.IsNullOrEmpty(_result))
                 {
-                    // Plain text found
+                    // Plain text
                     _resultType = ScanResultType.PLAIN_TEXT;
                     var copyActionText = Resources.GetText(Resource.String.action_copy);
                     resultButtonText = $"{copyActionText}: {_result}";
                 }
                 else
                 {
-                    // No data found
+                    // No data
                     _resultType = ScanResultType.UNKNOWN;
                 }
 
@@ -215,21 +225,30 @@ namespace SimpleQR
             switch (_resultType)
             {
                 case ScanResultType.WIFI:
-                    // TODO Offer to connect directly here?
+                    // Copy the password of the WIFI network
                     CrossClipboard.Current.SetText(_wifiAccessPoint.Password);
-                    var wifiToast = Toast.MakeText(this, "Password copied", ToastLength.Short);
+                    var passwordCopied = Resources.GetText(Resource.String.password_copied);
+                    var wifiToast = Toast.MakeText(this, passwordCopied, ToastLength.Short);
                     wifiToast.Show();
                     break;
                 case ScanResultType.URI:
                     // Open the result in a browser
-                    var uri = Uri.Parse(_result);
-                    var intent = new Intent(Intent.ActionView, uri);
-                    StartActivity(intent);
+                    var webUri = Uri.Parse(_result);
+                    var webIntent = new Intent(Intent.ActionView, webUri);
+                    StartActivity(webIntent);
                     break;
                 case ScanResultType.PLAIN_TEXT:
+                    // Copy the text to clipboard
                     CrossClipboard.Current.SetText(_result);
-                    var textToast = Toast.MakeText(this, "Result copied", ToastLength.Short);
+                    var textCopied = Resources.GetText(Resource.String.text_copied);
+                    var textToast = Toast.MakeText(this, textCopied, ToastLength.Short);
                     textToast.Show();
+                    break;
+                case ScanResultType.PHONE:
+                    // Offer to call the phone number
+                    var phoneUri = Uri.Parse($"tel:{_result}");
+                    var phoneIntent = new Intent(Intent.ActionView, phoneUri);
+                    StartActivity(phoneIntent);
                     break;
                 default:
                     // nop
@@ -259,24 +278,32 @@ namespace SimpleQR
             return null;
         }
 
+        private bool ResultIsPhoneNumber => Android.Util.Patterns.Phone.Matcher
+            (ResultIsTelUri ? _result.Substring(4) : _result).Matches();
+
+        private bool ResultIsTelUri => _result.StartsWith("tel:");
+
+
+
         private void HideResultWrapper(object sender, EventArgs eventArgs)
         {
             _resultButtonWrapper.Visibility = ViewStates.Gone;
         }
 
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions,
+        public override void OnRequestPermissionsResult(int requestCode,
+                                                        string[] permissions,
                                                         Permission[] grantResults)
         {
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
             if (grantResults.Length <= 0
                 || grantResults[0] != (int) Permission.Granted
-                || requestCode != RequestCodePermissions)
+                || requestCode != RequestCameraPermissionCode)
             {
                 return;
             }
             
-            if (AllPermissionsGranted)
+            if (CameraPermissionGranted)
             {
                 StartCamera();
             }

@@ -6,6 +6,7 @@ namespace SimpleQR.Enums
         URI,
         WIFI,
         PLAIN_TEXT,
+        PHONE,
         UNKNOWN
     }
 }

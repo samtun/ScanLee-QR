@@ -2,5 +2,10 @@
     <string name="app_name">SimpleQR</string>
     <string name="action_open">Open</string>
     <string name="action_copy">Copy</string>
+    <string name="action_call">Call</string>
+    <string name="action_call_ext"></string>
     <string name="action_copy_password_for">Copy password for</string>
+    <string name="text_copied">Copied text</string>
+    <string name="password_copied">Copied password</string>
+    <string name="no_data_found">No data found</string>
 </resources>
