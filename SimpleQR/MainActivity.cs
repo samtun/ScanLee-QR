@@ -153,11 +153,13 @@ namespace SimpleQR
                 _result = scanResult.RawValue;
                 var resultButtonText = "No Data Found";
                 _wifiAccessPoint = ResultToWifiInformation();
+
                 if (_wifiAccessPoint != null)
                 {
                     // WIFI Information found
                     _resultType = ScanResultType.WIFI;
-                    resultButtonText = $"Copy password for '{_wifiAccessPoint.Ssid}'";
+                    var copyPasswordForActionText = Resources.GetText(Resource.String.action_copy_password_for);
+                    resultButtonText = $"{copyPasswordForActionText}: {_wifiAccessPoint.Ssid}";
                 }
                 else if (URLUtil.IsValidUrl(_result))
                 {
@@ -170,7 +172,7 @@ namespace SimpleQR
                 {
                     // Plain text found
                     _resultType = ScanResultType.PLAIN_TEXT;
-                    var copyActionText = Resources.GetText(Resource.String.action_open);
+                    var copyActionText = Resources.GetText(Resource.String.action_copy);
                     resultButtonText = $"{copyActionText}: {_result}";
                 }
                 else

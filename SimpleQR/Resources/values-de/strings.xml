@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">SimpleQR</string>
+    <string name="action_open">Öffne</string>
+    <string name="action_copy">Kopiere</string>
+    <string name="action_copy_password_for">Kopiere Passwort für</string>
 </resources>
