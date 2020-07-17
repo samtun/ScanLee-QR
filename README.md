@@ -7,8 +7,9 @@ A simple QR scanner for Android. Created by using CameraX from AndroidX and Xama
 ## Features
 
 - Open URLs
-- Read Wifi Information (copy password)
-- Copy Plain text
+- Read WIFI information (copy password)
+- Copy plain text
+- Phone number
 
 ### Supported Languages
 
@@ -22,6 +23,5 @@ QR Code data patterns to come:
 - E-Mail
 - Event
 - Location
-- Phone number
-- Wifi (connect directly)
-- VCard
+- WIFI (connect directly)
+- VCard (add contact)
