@@ -8,9 +8,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: global::Android.Runtime.ResourceDesignerAttribute("SimpleQR.Resource", IsApplication=true)]
+[assembly: global::Android.Runtime.ResourceDesignerAttribute("ScanLeeQR.Resource", IsApplication=true)]
 
-namespace SimpleQR
+namespace ScanLeeQR
 {
 	
 	

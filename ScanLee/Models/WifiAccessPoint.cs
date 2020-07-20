@@ -1,4 +1,4 @@
-﻿namespace SimpleQR.Models
+﻿namespace ScanLeeQR.Models
 {
     public class WifiAccessPoint
     {

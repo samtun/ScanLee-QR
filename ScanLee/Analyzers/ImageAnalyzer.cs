@@ -3,7 +3,7 @@ using Android.Gms.Vision;
 using Android.Graphics;
 using AndroidX.Camera.Core;
 
-namespace SimpleQR.Analyzers
+namespace ScanLeeQR.Analyzers
 {
     /// <summary>
     /// Provides an implementation of ImageAnalysis.IAnalyzer and calls the given Action with a Frame from

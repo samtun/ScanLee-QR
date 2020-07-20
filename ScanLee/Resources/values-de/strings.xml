@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SimpleQR</string>
+    <string name="app_name">ScanLeeQR</string>
     <string name="action_open">Öffne</string>
     <string name="action_copy">Kopiere</string>
     <string name="action_call">Rufe</string>

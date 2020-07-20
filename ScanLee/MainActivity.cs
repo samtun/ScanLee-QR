@@ -19,12 +19,12 @@ using AndroidX.Core.Content;
 using Java.Lang;
 using Java.Util.Concurrent;
 using Plugin.Clipboard;
-using SimpleQR.Analyzers;
-using SimpleQR.Enums;
-using SimpleQR.Models;
+using ScanLeeQR.Analyzers;
+using ScanLeeQR.Enums;
+using ScanLeeQR.Models;
 using Uri = Android.Net.Uri;
 
-namespace SimpleQR
+namespace ScanLeeQR
 {
     [Activity(Label = "@string/app_name", Theme = "@style/Theme.AppCompat.Light.NoActionBar",
         MainLauncher = true, Icon = "@mipmap/ic_launcher",

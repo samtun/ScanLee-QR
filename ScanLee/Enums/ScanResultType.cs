@@ -1,5 +1,4 @@
-﻿using System;
-namespace SimpleQR.Enums
+﻿namespace ScanLeeQR.Enums
 {
     public enum ScanResultType
     {
