@@ -1,5 +1,7 @@
 # ScanLee QR
 
+![Screenshot](icon.png "")
+
 A simple QR scanner for Android. Created by using CameraX from AndroidX and Xamarin.Android.
 
 ![Screenshot](screenshot.png "Screenshot")
