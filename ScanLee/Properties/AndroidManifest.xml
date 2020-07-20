@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="nerrix.ScanLeeQR" android:versionName="2.2" android:versionCode="8">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="nerrix.ScanLeeQR" android:versionCode="9" android:versionName="3">
 	<uses-sdk android:minSdkVersion="23" android:targetSdkVersion="29" />
 	<uses-feature android:name="android.hardware.camera.any" />
 	<uses-permission android:name="android.permission.CAMERA" />
