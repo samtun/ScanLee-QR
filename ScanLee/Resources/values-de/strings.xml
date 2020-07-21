@@ -4,6 +4,7 @@
     <string name="action_copy">Kopiere</string>
     <string name="action_call">Rufe</string>
     <string name="action_call_ext">an</string>
+    <string name="action_email_to">Email an</string>
     <string name="action_copy_password_for">Kopiere Passwort für</string>
     <string name="text_copied">Text kopiert</string>
     <string name="password_copied">Passwort kopiert</string>

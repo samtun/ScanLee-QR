@@ -4,6 +4,7 @@
     <string name="action_copy">Copy</string>
     <string name="action_call">Call</string>
     <string name="action_call_ext"></string>
+    <string name="action_email_to">Email to</string>
     <string name="action_copy_password_for">Copy password for</string>
     <string name="text_copied">Copied text</string>
     <string name="password_copied">Copied password</string>

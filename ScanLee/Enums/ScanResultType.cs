@@ -6,6 +6,7 @@
         WIFI,
         PLAIN_TEXT,
         PHONE,
+        EMAIL,
         UNKNOWN
     }
 }

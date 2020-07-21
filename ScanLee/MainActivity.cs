@@ -178,6 +178,14 @@ namespace ScanLeeQR
                     }
                     resultButtonText = $"{callActionText} {_result} {callExtActionText}";
                 }
+                else if (_result.StartsWith("mailto:"))
+                {
+                    // E-Mail
+                    _resultType = ScanResultType.EMAIL;
+                    var emailActionText = Resources.GetText(Resource.String.action_email_to);
+                    var email = _result.Split(":")[1].Split("?")[0];
+                    resultButtonText = $"{emailActionText}: {email}";
+                }
                 else if (!string.IsNullOrEmpty(_result))
                 {
                     // Plain text
@@ -237,18 +245,24 @@ namespace ScanLeeQR
                     var webIntent = new Intent(Intent.ActionView, webUri);
                     StartActivity(webIntent);
                     break;
+                case ScanResultType.PHONE:
+                    // Offer to call the phone number
+                    var phoneUri = Uri.Parse($"tel:{_result}");
+                    var phoneIntent = new Intent(Intent.ActionView, phoneUri);
+                    StartActivity(phoneIntent);
+                    break;
+                case ScanResultType.EMAIL:
+                    // Open the E-Mail URI to send an E-Mail to the given adress
+                    var emailUri = Uri.Parse(_result);
+                    var emailIntent = new Intent(Intent.ActionView, emailUri);
+                    StartActivity(emailIntent);
+                    break;
                 case ScanResultType.PLAIN_TEXT:
                     // Copy the text to clipboard
                     CrossClipboard.Current.SetText(_result);
                     var textCopied = Resources.GetText(Resource.String.text_copied);
                     var textToast = Toast.MakeText(this, textCopied, ToastLength.Short);
                     textToast.Show();
-                    break;
-                case ScanResultType.PHONE:
-                    // Offer to call the phone number
-                    var phoneUri = Uri.Parse($"tel:{_result}");
-                    var phoneIntent = new Intent(Intent.ActionView, phoneUri);
-                    StartActivity(phoneIntent);
                     break;
                 default:
                     // nop
